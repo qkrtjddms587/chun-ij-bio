@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Material {
+  id Int @id @default(autoincrement())
+
+  name            String
+  code            String  @unique
+  classification1 String
+  classification2 String
+  classification3 String?
+  unit            String
+  etc             String?
+
+  recipes RecipeMaterial[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Product       Product?        @relation(fields: [productId], references: [id])
+  productId     Int?
+  ProductStock  ProductStock[]
+  MaterialStock MaterialStock[]
+}
+
+model Recipe {
+  id Int @id @default(autoincrement())
+
+  name      String
+  materials RecipeMaterial[]
+  etc       String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  product Product @relation(fields: [productId], references: [id])
+
+  productId    Int
+  Task         Task[]
+  ProductStock ProductStock[]
+}
+
+model RecipeMaterial {
+  id         Int @id @default(autoincrement())
+  recipeId   Int
+  materialId Int
+  ratio      Int
+
+  recipe   Recipe   @relation(fields: [recipeId], references: [id])
+  material Material @relation(fields: [materialId], references: [id])
+
+  @@unique([recipeId, materialId])
+}
+
+model Product {
+  id   Int    @id @default(autoincrement())
+  code String @unique
+  name String
+
+  recipes   Recipe[]
+  materials Material[]
+
+  unit            String
+  etc             String?
+  classification1 String
+  classification2 String
+  classification3 String?
+  standard        Int
+  oem             String?
+  isCompleted     Boolean
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  semiProductName String?
+  Task            Task[]
+
+  ProductStock ProductStock[]
+}
+
+model Task {
+  id        Int @id @default(autoincrement())
+  productId Int
+  recipeId  Int
+
+  product Product @relation(fields: [productId], references: [id])
+  recipe  Recipe  @relation(fields: [recipeId], references: [id])
+
+  planQuantity    Int
+  resultQuantity  Int
+  line            String
+  manager         String
+  staff           String
+  planStartTime   DateTime
+  planEndTime     DateTime
+  resultStartTime DateTime?
+  resultEndTime   DateTime?
+  status          String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model NonTask {
+  id        Int       @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime?
+  reason1   String
+  reason2   String
+  line      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductStock {
+  id         Int       @id @default(autoincrement())
+  productId  Int
+  materialId Int?
+  recipeId   Int?
+  Recipe     Recipe?   @relation(fields: [recipeId], references: [id])
+  Material   Material? @relation(fields: [materialId], references: [id])
+
+  product  Product @relation(fields: [productId], references: [id])
+  quantity Int     @default(0)
+}
+
+model MaterialStock {
+  materialId Int
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@id([materialId])
+}
