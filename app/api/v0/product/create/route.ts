@@ -32,7 +32,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const validatedData = await ProductSchema.spa(body);
   if (!validatedData.success)
-    return NextResponse.json({ success: false }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: validatedData.error },
+      { status: 400 }
+    );
   const exist = await db.product.findUnique({
     where: {
       code: validatedData.data!.code,
@@ -41,12 +44,19 @@ export async function POST(req: NextRequest) {
       id: true,
     },
   });
-  if (exist) return NextResponse.json({ success: false }, { status: 400 });
+  if (exist)
+    return NextResponse.json(
+      { success: false, message: "product is exist" },
+      { status: 400 }
+    );
   const newProduct = await db.product.create({
     data: { ...validatedData.data },
     select: { id: true },
   });
   if (!newProduct)
-    return NextResponse.json({ success: false }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "product create failed" },
+      { status: 400 }
+    );
   return NextResponse.json({ success: true }, { status: 200 });
 }
