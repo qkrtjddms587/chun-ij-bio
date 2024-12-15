@@ -12,6 +12,9 @@ export async function GET(
     where: { id: productId, deletedAt: null },
     include: {
       recipes: {
+        where: {
+          deletedAt: null,
+        },
         include: {
           materials: { include: { material: true } },
         },
