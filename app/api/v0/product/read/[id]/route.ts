@@ -11,7 +11,11 @@ export async function GET(
   const product = await db.product.findUnique({
     where: { id: productId, deletedAt: null },
     include: {
-      recipes: true,
+      recipes: {
+        include: {
+          materials: { include: { material: true } },
+        },
+      },
       materials: true,
     },
   });
