@@ -1,5 +1,4 @@
-import { any, z } from "zod";
-import { MaterialSchema } from "./material";
+import { z } from "zod";
 
 export const ProductSchema = z.object({
   code: z.string().min(1),
@@ -13,9 +12,7 @@ export const ProductSchema = z.object({
   oem: z.string().optional().nullable(),
   isCompleted: z.boolean(),
   semiProductName: z.string().optional().nullable(),
-  materials: z
-    .object({ connect: z.array(z.object({ id: z.number().int().positive() })) })
-    .optional(),
+  materials: z.array(z.object({ id: z.number().int().positive() })).optional(),
 });
 
 export type ProductType = z.infer<typeof ProductSchema>;

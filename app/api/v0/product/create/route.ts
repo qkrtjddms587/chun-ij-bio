@@ -50,7 +50,10 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   const newProduct = await db.product.create({
-    data: { ...validatedData.data },
+    data: {
+      ...validatedData.data,
+      materials: { connect: validatedData.data.materials },
+    },
     select: { id: true },
   });
   if (!newProduct)

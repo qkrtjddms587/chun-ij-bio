@@ -23,7 +23,10 @@ export async function PATCH(
   if (!exist) return NextResponse.json({ success: false }, { status: 400 });
   const updateProduct = await db.product.update({
     where: { id: productId },
-    data: validatedData.data,
+    data: {
+      ...validatedData.data,
+      materials: { connect: validatedData.data.materials },
+    },
     select: { id: true },
   });
   if (!updateProduct)
