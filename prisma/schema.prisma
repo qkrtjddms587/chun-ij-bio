@@ -34,6 +34,8 @@ model Material {
   productId     Int?
   ProductStock  ProductStock[]
   MaterialStock MaterialStock[]
+  SemiProduct   SemiProduct?    @relation(fields: [semiProductId], references: [id])
+  semiProductId Int?
 }
 
 model Recipe {
@@ -49,9 +51,11 @@ model Recipe {
 
   product Product @relation(fields: [productId], references: [id])
 
-  productId    Int
-  Task         Task[]
-  ProductStock ProductStock[]
+  productId     Int
+  Task          Task[]
+  ProductStock  ProductStock[]
+  SemiProduct   SemiProduct?   @relation(fields: [semiProductId], references: [id])
+  semiProductId Int?
 }
 
 model RecipeMaterial {
@@ -81,16 +85,43 @@ model Product {
   classification3 String?
   standard        Int
   oem             String?
-  isCompleted     Boolean
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  semiProductName String?
-  Task            Task[]
+  Task Task[]
 
-  ProductStock ProductStock[]
+  productStock  ProductStock[]
+  semiProduct   SemiProduct?   @relation(fields: [semiProductId], references: [id])
+  semiProductId Int?
+}
+
+model SemiProduct {
+  id   Int    @id @default(autoincrement())
+  code String @unique
+  name String
+
+  recipes   Recipe[]
+  materials Material[]
+
+  unit            String
+  etc             String?
+  classification1 String
+  classification2 String
+  classification3 String?
+  standard        Int
+  oem             String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Task Task[]
+
+  productStock ProductStock[]
+
+  products Product[]
 }
 
 model Task {
@@ -112,9 +143,11 @@ model Task {
   resultEndTime   DateTime?
   status          String
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+  SemiProduct   SemiProduct? @relation(fields: [semiProductId], references: [id])
+  semiProductId Int?
 }
 
 model NonTask {
@@ -137,8 +170,10 @@ model ProductStock {
   Recipe     Recipe?   @relation(fields: [recipeId], references: [id])
   Material   Material? @relation(fields: [materialId], references: [id])
 
-  product  Product @relation(fields: [productId], references: [id])
-  quantity Int     @default(0)
+  product       Product      @relation(fields: [productId], references: [id])
+  quantity      Int          @default(0)
+  SemiProduct   SemiProduct? @relation(fields: [semiProductId], references: [id])
+  semiProductId Int?
 }
 
 model MaterialStock {

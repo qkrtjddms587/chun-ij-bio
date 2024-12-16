@@ -1,6 +1,6 @@
 import db from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { ProductSchema } from "../../(z-schema)/product";
+import { SemiProductSchema } from "../../(z-schema)/semiProduct";
 
 export async function PATCH(
   req: NextRequest,
@@ -9,10 +9,10 @@ export async function PATCH(
   const { id } = await params;
   const productId = parseInt(id);
   const body = await req.json();
-  const validatedData = await ProductSchema.spa(body);
+  const validatedData = await SemiProductSchema.spa(body);
   if (!validatedData.success)
     return NextResponse.json({ success: false }, { status: 400 });
-  const exist = await db.product.findUnique({
+  const exist = await db.semiProduct.findUnique({
     where: {
       id: productId,
     },
@@ -21,13 +21,13 @@ export async function PATCH(
     },
   });
   if (!exist) return NextResponse.json({ success: false }, { status: 400 });
-  const updateProduct = await db.product.update({
+  const updateProduct = await db.semiProduct.update({
     where: { id: productId },
     data: {
       ...validatedData.data,
       recipes: { connect: validatedData.data.recipes },
       materials: { connect: validatedData.data.materials },
-      semiProduct: { connect: validatedData.data.semiProduct },
+      products: { connect: validatedData.data.products },
     },
     select: { id: true },
   });

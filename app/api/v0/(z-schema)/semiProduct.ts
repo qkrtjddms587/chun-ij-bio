@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ProductSchema = z.object({
+export const SemiProductSchema = z.object({
   code: z.string().min(1),
   name: z.string().min(1),
   unit: z.string().min(1),
@@ -10,9 +10,9 @@ export const ProductSchema = z.object({
   classification3: z.string().optional().nullable(),
   standard: z.number().int().positive(),
   oem: z.string().optional().nullable(),
-  semiProduct: z.object({ id: z.number().int().positive() }).optional(),
   materials: z.array(z.object({ id: z.number().int().positive() })).optional(),
   recipes: z.array(z.object({ id: z.number().int().positive() })).optional(),
+  products: z.array(z.object({ id: z.number().int().positive() })).optional(),
 });
 
-export type ProductType = z.infer<typeof ProductSchema>;
+export type ProductType = z.infer<typeof SemiProductSchema>;
